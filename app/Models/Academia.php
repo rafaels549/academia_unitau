@@ -18,4 +18,8 @@ class Academia extends Model
     public function eventos(){
          return $this->hasMany(Evento::class,"academia_id");
     }
+
+    public function usuarios(){
+           return $this->belongToMany(User::class,"usuarios_evento","academia_id","user_id");
+    }
 }

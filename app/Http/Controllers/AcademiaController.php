@@ -117,8 +117,8 @@ public function permit(Academia $academia,User $user){
 
    try{
 
-      $academia->user_id=$user->id;
-        $academia->save();
+      $academia->usarios()->attach($user->id);
+        
         return response->json(["sucess"=>"OK"],200);
    }catch(\Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
