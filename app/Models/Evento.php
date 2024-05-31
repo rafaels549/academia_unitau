@@ -11,10 +11,12 @@ class Evento extends Model
 use HasFactory;
 
 public function users(){
-return $this->belongsToMany("eventos_user","event_id","user_id");
+return $this->belongsToMany(User::class, "eventos_user","event_id","user_id");
 }
 
 public function academia(){
     return $this->belongsTo(Academia::class,"academia_id");
 }
+
+
 }

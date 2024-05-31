@@ -20,7 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'ra'
+        'ra',
+        "is_admin"
     ];
 
     /**
@@ -53,6 +54,6 @@ class User extends Authenticatable
         return $this->hasMany(Presenca::class, "user_id");
     }
     public function eventos(){
-        return $this->belongsToMany("eventos_user","user_id","event_id");
+        return $this->belongsToMany(Evento::class, "eventos_user","user_id","event_id");
     }
 }
