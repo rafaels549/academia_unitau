@@ -21,8 +21,11 @@ class User extends Authenticatable
         'email',
         'password',
         'ra',
-        "is_admin"
+        "is_admin",
+        'is_blocked'
     ];
+
+    protected $appends = ['faltou'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -56,4 +59,6 @@ class User extends Authenticatable
     public function eventos(){
         return $this->belongsToMany(Evento::class, "eventos_user","user_id","event_id");
     }
+
+    
 }

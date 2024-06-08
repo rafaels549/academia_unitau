@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('specific_dates', function (Blueprint $table) {
             $table->id();
             $table->date("data");
-            $table->time("start_hour")->nullabe();
-            $table->time("end_hour")->nullabe();
+            $table->time("start_hour")->nullable();
+            $table->time("end_hour")->nullable();
+         
             $table->unsignedBigInteger("academia_id");
             $table->foreign('academia_id')->references('id')->on('academias')->onDelete('cascade');
             $table->timestamps();

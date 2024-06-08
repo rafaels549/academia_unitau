@@ -19,9 +19,11 @@ class UserResource extends JsonResource
             "name" => $this->name,
             "email" => $this->email,
             "faltas" => $this->faltas->count(),
+            "faltasEvento" => $this->faltas,
             "ra" => $this->ra,
             "is_admin" => $this->is_admin,
             'image' => url('/') . $this->avatar,
+            "is_blocked" => $this->is_blocked
         ];
     }
 }

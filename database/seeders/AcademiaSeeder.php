@@ -14,6 +14,7 @@ class AcademiaSeeder extends Seeder
     public function run(): void
     {
         DB::table('academias')->insert([
+            "name" => "Unitau",
             'phone' => '123-456-7890',
             'capacidade' => 100,
             'user_id' => 1, // Ensure this user_id exists in the users table

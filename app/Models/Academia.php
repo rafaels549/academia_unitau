@@ -10,8 +10,8 @@ class Academia extends Model
 {
     use HasFactory;
 
-
-    public function open_days(){
+    protected $fillable = ['name', 'phone', 'capacidade'];
+    public function schedules(){
           return $this->hasMany(OpenDay::class,"academia_id");
     }
 
@@ -19,7 +19,13 @@ class Academia extends Model
          return $this->hasMany(Evento::class,"academia_id");
     }
 
+    public function specificDates() {
+        return $this->hasMany(SpecificDate::class, "academia_id");
+    }
+
     public function usuarios(){
            return $this->belongToMany(User::class,"usuarios_evento","academia_id","user_id");
     }
+
+    
 }

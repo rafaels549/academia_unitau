@@ -12,7 +12,7 @@ use App\Services\FileService;
 class UserController extends Controller
 {
     public function getUsers() {
-        $users = User::where("id", "!=",auth()->user()->id)->get();
+        $users = User::all();
         return response()->json(['users' => UserResource::collection($users)]);
 
     }
@@ -36,7 +36,8 @@ class UserController extends Controller
             'email' => $request->email,
             'ra' => $request->ra,
             'password' => bcrypt("password"),
-            'is_admin' => $request->role === 'admin' ? 1 : 0
+            'is_admin' => $request->role === 'admin' ? 1 : 0,
+            'is_blocked' => 0
         ]);
 
       
@@ -78,6 +79,22 @@ class UserController extends Controller
    $user->update([
       'is_admin' => 1
    ]);
+}
+
+   public function block($id) {
+
+    $user = User::findOrFail($id);
+    $user->update([
+        'is_blocked' => 1
+     ]);
+ 
+}
+
+public function unblock($id) {
+    $user = User::findOrFail($id);
+$user->update([
+  'is_blocked' => 0
+]);
 
  
       

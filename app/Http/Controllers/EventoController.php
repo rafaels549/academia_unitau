@@ -16,6 +16,10 @@ class EventoController extends Controller
                   "time"=>"required"
            ]);
 
+           try {
+
+      
+
            $date = Carbon::parse($request->date)->format('Y-m-d');
            $time = Carbon::parse($request->time)->format('H:i:s');
        
@@ -24,9 +28,13 @@ class EventoController extends Controller
                ->where('time', $time)
                ->first();
        
-         
+         if(auth()->user()->eventos()->where("event_id",$existingEvent?->id)->exists()) {
+            return response()->json(['errors' => "Você já possui um evento para esta data e hora"], 400);
+         }  
 
             if(!$existingEvent) {
+
+            
                $event = new Evento();
                $event->date = $date;
                $event->time = $time;
@@ -36,11 +44,18 @@ class EventoController extends Controller
                $event->users()->attach(auth()->user()->id);
             } else {
                if($existingEvent->users()->count() > $existingEvent->academia->capacidade) {
-                  throw \Illuminate\Validation\ValidationException::withMessages([
-                     'date' => ['O evento já está lotado para esta data e hora.']
-                 ]);
+                  return response()->json(['errors' => "O evento já está lotado para esta data e hora"], 400);
                }
+               if(!auth()->user()->eventos()->where("event_id",$existingEvent->id)->exists()){
                $existingEvent->users()->attach(auth()->user()->id);
+               }
+
+             
+              
+            }
+
+         }   catch(\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
             }
             
          
@@ -88,6 +103,14 @@ public function getAllEvents() {
        }catch(\Exception $e) {
           return response()->json(['error' => $e->getMessage()], 400);
        }
+}
+
+public function cancelarAgendamento($id) {
+ $event = Evento::findOrFail($id);
+ $event->users()->detach(auth()->user()->id);
+ if($event->users()->count() < 1) {
+   $event->delete();
+ }
 }
 
 

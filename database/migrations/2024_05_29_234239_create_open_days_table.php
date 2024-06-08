@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('open_days', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("day");
-            $table->time("start_hour");
-            $table->time("end_hour");
+            $table->time("opening_time");
+            $table->time("closing_time");
             $table->unsignedBigInteger("academia_id");
             $table->foreign('academia_id')->references('id')->on('academias')->onDelete('cascade');
             $table->timestamps();

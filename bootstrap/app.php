@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'admin' => \App\Http\Middleware\isAdmin::class,
+            'blocked' => \App\Http\Middleware\IsBlocked::class,
+            'cors' => \App\Http\Middleware\Cors::class
         ]);
 
         //

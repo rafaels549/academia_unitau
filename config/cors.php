@@ -16,18 +16,17 @@ return [
     */
 
     'paths' => [
-        '/*',
-        '/api/*',
-        '/login',
-        '/register',
-        '/logout',
-        '/sanctum/csrf-cookie'
+       '/*',
+       '/api/*',
+       '/api/login',
+       '/api/register',
+       '/api/sanctum/csrf-cookie'
     ],
 
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => ['https://www.academiaunitau.site'],
 
     'allowed_origins_patterns' => [],
 
