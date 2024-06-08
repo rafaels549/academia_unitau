@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/api', function () {
+Route::get('/', function () {
     return ['Laravel' => app()->version()];
 });
 
