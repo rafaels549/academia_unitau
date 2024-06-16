@@ -24,36 +24,36 @@ class AcademiaController extends Controller
               'end_hour'=>"required"
      ]);
         try{
-       
+
 
          $academia = new Academia();
          $academia->phone= $request->telefone;
          $academia->capacidade= $request->capacidade;
          $days[]=$request->days;
 
-                
 
-               
+
+
           foreach($days as $day){
                    $open_day = new OpenDay();
                     $open_day->academia_id =$academia->id;
-                    
-                     
+
+
                     $open_day->day = $day;
                     $open_day->start_hour =$request->start_hour;
                     $open_day->end_hour = $request->end_hour;
-                   
 
-                  
+
+
                     $open_day->save();
 
 
-                    
+
 
 
           }
-          
-         
+
+
          $academia->save();
     }catch(\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 400);
@@ -71,9 +71,9 @@ class AcademiaController extends Controller
 
         // Remove existing schedules
         $academia->schedules()->delete();
-      
+
         foreach ($request->schedule as $index => $schedule) {
-        
+
 $dia = null;
 
           switch ($schedule['day']) {
@@ -101,7 +101,7 @@ $dia = null;
         }
 
             $academia->schedules()->create([
-              
+
                 'day' => $dia->value,
                 'opening_time' => $schedule['openingTime'],
                 'closing_time' => $schedule['closingTime'],
@@ -113,39 +113,39 @@ $dia = null;
         return response()->json(['error' => $e->getMessage()], 400);
     }
 }
- 
+
 
 public function getAcademia(){
  try{
-     
+
    $academia = Academia::findOrFail(1);
-       
+
      return response()->json(["academia"=> new AcademiaResource($academia)],200);
       }catch(\Exception $e) {
          return response()->json(['error' => $e->getMessage()], 400);
-      } 
+      }
 }
 
 public function delete(Academia $academia){
  try{
-     
+
            $academia->delete();
-       
+
      return response()->json(["sucess"=>"OK"],200);
       }catch(\Exception $e) {
          return response()->json(['error' => $e->getMessage()], 400);
-      } 
+      }
 }
 public function permit(Academia $academia,User $user){
 
    try{
 
       $academia->usarios()->attach($user->id);
-        
+
         return response()->json(["sucess"=>"OK"],200);
    }catch(\Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
-   } 
+   }
 
 }
 
@@ -160,20 +160,26 @@ public function miss($id, $id1){
 
       $falta->save();
 
-    
+      if($user->faltas->count() > 20) {
+        $user->update([
+            'is_blocked' => 1
+         ]);
+      }
+
+
     return response()->json(["sucess"=>"OK"],200);
 }catch(\Exception $e) {
   return response()->json(['error' => $e->getMessage()], 400);
-} 
+}
 }
 
 public function presence($userId, $eventId) {
    try {
-      
+
        $user = User::findOrFail($userId);
        $event = Evento::findOrFail($eventId);
 
-      
+
        $falta = Falta::where('user_id', $user->id)
                      ->where('event_id', $event->id)
                      ->first();
@@ -198,7 +204,7 @@ public function getAcademiaEvents(Academia $academia){
         return response()->json(["events"=>$events],200);
 }catch(\Exception $e) {
   return response()->json(['error' => $e->getMessage()], 400);
-} 
+}
  }
  public function getAcademiaEvent(Academia $academia,Evento $event){
    try{
@@ -207,7 +213,7 @@ public function getAcademiaEvents(Academia $academia){
         return response()->json(["events"=>$event],200);
 }catch(\Exception $e) {
   return response()->json(['error' => $e->getMessage()], 400);
-} 
+}
  }
 
  public function removerData(Request $request) {
@@ -218,24 +224,24 @@ public function getAcademiaEvents(Academia $academia){
             $specific->delete();
         }    else {
 
-          
+
     $academia = Academia::findOrFail(1);
     $academia->specificDates()->create([
        "data" => $data,
        "type" => "remover"
     ]);
 }
-  
+
 } catch(\Exception $e) {
     return response()->json(['error' => $e->getMessage()], 400);
-  } 
+  }
  }
 
  public function adicionarData(Request $request) {
     try {
 
   $data = Carbon::parse($request->date)->format('Y-m-d');
-  
+
   if(SpecificDate::where("data", $data)->where("type", "remover")->exists()) {
      $specific = SpecificDate::where("data", $data)->where("type", "remover")->first();
      $specific->delete();
@@ -250,10 +256,10 @@ public function getAcademiaEvents(Academia $academia){
        "type" => "adicionar"
     ]);
 }
-  
+
 } catch(\Exception $e) {
     return response()->json(['error' => $e->getMessage()], 400);
-  } 
+  }
  }
 
 }

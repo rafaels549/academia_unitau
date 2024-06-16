@@ -16,12 +16,12 @@ class EventoResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-          "id" => $this->id, 
+          "id" => $this->id,
           "datetime" => Carbon::parse($this->date)->format('d/m/Y'),
-          "time" => Carbon::parse($this->time)->format('H:i'), 
+          "time" => Carbon::parse($this->time)->format('H:i'),
           "academia" => $this->academia,
           "users" => UserResource::collection($this->users),
-       
+         "vagas" => $this->academia->capacidade -  $this->users->count()
         ];
     }
 }

@@ -21,26 +21,26 @@ Route::middleware(['auth:sanctum'])->group( function () {
 
 
     Route::prefix('events')->group(function(){
-          Route::post("/create", [EventoController::class,"store"]); 
+          Route::post("/create", [EventoController::class,"store"]);
           Route::put("/update/{id}", [EventoController::class,"update"]);
           Route::delete("/delete/{id}",[ EventoController::class , "delete"]);
-          Route::get("/get",[EventoController::class , "getEvents"]); 
-          Route::get("/{id}",[EventoController::class , "getEvent"]);     
+          Route::get("/get",[EventoController::class , "getEvents"]);
+          Route::get("/{id}",[EventoController::class , "getEvent"]);
           Route::post("{id}/miss/{id1}",[AcademiaController::class,"miss"]);
           Route::post("{id}/presenca/{id1}",[AcademiaController::class,"presence"]);
           Route::patch("/cancelaragendamento/{id}", [EventoController::class, "cancelarAgendamento"]);
     });
 
     Route::prefix('academia')->group(function(){
-        Route::post("/create", [AcademiaController::class,"store"]); 
+        Route::post("/create", [AcademiaController::class,"store"]);
         Route::put("/update", [AcademiaController::class,"update"])->middleware('admin');
         Route::delete("/delete", [AcademiaController::class , "delete"]);
-      
-        Route::get("/{id}",[AcademiaController::class , "getAcademia"]); 
-     
+
+        Route::get("/{id}",[AcademiaController::class , "getAcademia"]);
+
          Route::get("{id}/permission/{id1}",[AcademiaController::class,"permit"]);
          Route::get('/getacademia', [AcademiaController::class, "getAcademia"])->middleware('admin');
-      
+
 
          Route::get("{id}/events/",[ AcademiaController::class,"getAcademiaEvents"]);
 
@@ -49,7 +49,7 @@ Route::middleware(['auth:sanctum'])->group( function () {
          Route::patch("/removerdata", [AcademiaController::class, "removerData"])->middleware('admin');
 
                 });
-    
+    Route::patch("/getVagas", [GeneralController::class, "getVagas"]);
         Route::get('/users', [UserController::class, 'getUsers'])->middleware('admin');
         Route::post('/users/create', [UserController::class, 'addUser'])->middleware('admin');
         Route::post('/user-image', [UserController::class, 'updateUserImage']);
