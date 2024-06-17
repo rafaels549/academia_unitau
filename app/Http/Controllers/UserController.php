@@ -19,31 +19,35 @@ class UserController extends Controller
 
     public function addUser(Request $request) {
 
-      
+
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'ra' => ['required',  'min:8', 'max:8', 'unique:'.User::class],
-            'role' => ['required', 'in:admin,user']
-            
+            'role' => ['required', 'in:admin,user'],
+            'curso' => ['nullable', 'string', 'max:255'],
+            'periodo' => ['nullable', 'integer'],
+
         ]);
 
-    
+
 
             User::create([
             'name' => $request->name,
             'email' => $request->email,
             'ra' => $request->ra,
+            'curso' => $request->curso,
+            'periodo' => $request->periodo,
             'password' => bcrypt("password"),
             'is_admin' => $request->role === 'admin' ? 1 : 0,
             'is_blocked' => 0
         ]);
 
-      
+
 
         return response()->noContent();
-           
+
     }
   /**
      * Store a newly created resource in storage.
@@ -55,7 +59,7 @@ class UserController extends Controller
         if($request->height == '' || $request->width == '' || $request->top == '' || $request->left == '') {
             return response()->json(['error' => 'The dimensions are incomplete'], 400);
         }
-      
+
         try {
         $user = (new FileService)->updateImage(auth()->user(), $request);
         $user->save();
@@ -71,7 +75,7 @@ class UserController extends Controller
         $user->update([
             'is_admin' => 0
          ]);
-     
+
     }
 
     public function makeAdmin($id) {
@@ -87,7 +91,7 @@ class UserController extends Controller
     $user->update([
         'is_blocked' => 1
      ]);
- 
+
 }
 
 public function unblock($id) {
@@ -96,10 +100,10 @@ $user->update([
   'is_blocked' => 0
 ]);
 
- 
-      
+
+
     }
 
-   
+
 
 }

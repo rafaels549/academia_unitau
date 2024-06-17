@@ -20,6 +20,7 @@ class AcademiaResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'capacidade' => $this->capacidade,
+            "faltas" => $this->max_faltas,
             'schedules' => ScheduleResource::collection($this->schedules),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

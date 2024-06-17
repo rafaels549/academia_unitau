@@ -67,7 +67,7 @@ class AcademiaController extends Controller
 
     try {
         $academia = Academia::findOrFail(1);
-        $academia->update($request->only(['name', 'phone', 'capacidade']));
+        $academia->update($request->only(['name', 'phone', 'capacidade', 'max_faltas']));
 
         // Remove existing schedules
         $academia->schedules()->delete();
@@ -151,7 +151,7 @@ public function permit(Academia $academia,User $user){
 
 public function miss($id, $id1){
    try{
-
+      $academia = Academia::findOrFail(1);
       $user  = User::findOrFail($id);
       $event = Evento::findOrFail($id1);
       $falta = new Falta;
@@ -160,7 +160,7 @@ public function miss($id, $id1){
 
       $falta->save();
 
-      if($user->faltas->count() > 20) {
+      if($user->faltas->count() > $academia->max_faltas) {
         $user->update([
             'is_blocked' => 1
          ]);

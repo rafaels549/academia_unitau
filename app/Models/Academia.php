@@ -10,7 +10,7 @@ class Academia extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'phone', 'capacidade'];
+    protected $fillable = ['name', 'phone', 'capacidade', 'max_faltas'];
     public function schedules(){
           return $this->hasMany(OpenDay::class,"academia_id");
     }
@@ -27,5 +27,5 @@ class Academia extends Model
            return $this->belongToMany(User::class,"usuarios_evento","academia_id","user_id");
     }
 
-    
+
 }

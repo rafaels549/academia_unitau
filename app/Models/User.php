@@ -22,7 +22,10 @@ class User extends Authenticatable
         'password',
         'ra',
         "is_admin",
-        'is_blocked'
+        'is_blocked',
+        'curso',
+        'periodo',
+        'documento'
     ];
 
     protected $appends = ['faltou'];
@@ -60,5 +63,5 @@ class User extends Authenticatable
         return $this->belongsToMany(Evento::class, "eventos_user","user_id","event_id");
     }
 
-    
+
 }

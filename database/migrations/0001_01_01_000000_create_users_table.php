@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string("curso")->nullable();
             $table->integer("periodo")->nullable();
+            $table->string("documento")->nullable();
             $table->string('ra')->unique();
             $table->boolean("is_admin")->default(false);
             $table->timestamp('email_verified_at')->nullable();

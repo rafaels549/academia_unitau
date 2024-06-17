@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserResource extends JsonResource
 {
@@ -15,10 +16,13 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            "id" => $this->id, 
+            "id" => $this->id,
             "name" => $this->name,
             "email" => $this->email,
             "faltas" => $this->faltas->count(),
+            "curso" => $this->curso,
+            "periodo" => $this->periodo,
+            "documento" => $this->documento ? url('/') . Storage::url($this->documento) : null,
             "faltasEvento" => $this->faltas,
             "ra" => $this->ra,
             "is_admin" => $this->is_admin,

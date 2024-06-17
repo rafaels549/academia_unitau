@@ -17,6 +17,7 @@ class AcademiaSeeder extends Seeder
             "name" => "Unitau",
             'phone' => '123-456-7890',
             'capacidade' => 20,
+            'max_faltas' => 20,
             'user_id' => 1, // Ensure this user_id exists in the users table
             'created_at' => now(),
             'updated_at' => now(),

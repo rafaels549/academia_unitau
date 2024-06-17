@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string("phone");
             $table->string("name");
             $table->integer("capacidade");
+            $table->integer("max_faltas");
             $table->unsignedBigInteger("user_id")->nullabe();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade'); 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
