@@ -12,9 +12,9 @@ use App\Services\FileService;
 class UserController extends Controller
 {
     public function getUsers() {
-        $users = User::all();
+        $authenticatedUserId = auth()->id(); // Obtém o ID do usuário autenticado
+        $users = User::where('id', '!=', $authenticatedUserId)->get(); // Filtra para excluir o usuário autenticado
         return response()->json(['users' => UserResource::collection($users)]);
-
     }
 
     public function addUser(Request $request) {
