@@ -48,15 +48,32 @@ class GeneralController extends Controller
         // Obter o dia da semana em formato ISO (1 = segunda-feira, 7 = domingo)
         $dayOfWeek = $formattedDate->dayOfWeekIso;
 
-        // Ajuste se for domingo
+
         switch($dayOfWeek) {
             case 1:
-            $dayOfWeek = 7;
-            break;
+                $dayOfWeek = 2;
+                break;
+            case 2:
+                $dayOfWeek = 3;
+                break;
+            case 3:
+                $dayOfWeek = 4;
+                break;
+            case 4:
+                $dayOfWeek = 5;
+                break;
+            case 5:
+                $dayOfWeek = 6;
+                break;
+            case 6:
+                $dayOfWeek = 7;
+                break;
             case 7:
                 $dayOfWeek = 1;
                 break;
+
         }
+
 
         $horarios = [];
         $academia = Academia::findOrFail(1);
