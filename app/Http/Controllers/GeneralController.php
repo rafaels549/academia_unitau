@@ -50,6 +50,9 @@ class GeneralController extends Controller
 
         // Ajuste se for domingo
         switch($dayOfWeek) {
+            case 1:
+            $dayOfWeek = 7;
+            break;
             case 7:
                 $dayOfWeek = 1;
                 break;
