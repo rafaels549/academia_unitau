@@ -8,12 +8,43 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Validator;
+
 
 class UserController extends Controller
 {
+    public function login(Request $request)
+    {
+    
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+      
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
     public function getUsers() {
-        $authenticatedUserId = auth()->id(); // Obtém o ID do usuário autenticado
-        $users = User::where('id', '!=', $authenticatedUserId)->get(); // Filtra para excluir o usuário autenticado
+        $authenticatedUserId = auth()->id();
+        $users = User::where('id', '!=', $authenticatedUserId)->get(); 
         return response()->json(['users' => UserResource::collection($users)]);
     }
 

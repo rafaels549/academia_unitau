@@ -14,9 +14,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return new UserResource($request->user());
 });
 
+Route::post('/login', [UserController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group( function () {
-
+    Route::post('/logout', [UserController::class, 'logout']);
     Route::middleware('blocked')->group(function () {
 
 
