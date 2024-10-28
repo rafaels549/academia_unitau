@@ -9,12 +9,22 @@ use App\Http\Controllers\GeneralController;
 use App\Http\Controllers\UserController;
 use App\Http\Resources\UserResource;
 use App\Models\Academia;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return new UserResource($request->user());
 });
 
 Route::post('/login', [UserController::class, 'login']);
+
+Route::post('/reset-password', [NewPasswordController::class, 'store'])
+                ->middleware('guest')
+                ->name('password.store');
+
+                Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+                ->middleware('guest')
+                ->name('password.email');
 
 Route::middleware(['auth:sanctum'])->group( function () {
     Route::post('/logout', [UserController::class, 'logout']);

@@ -13,7 +13,8 @@ class EventoController extends Controller
 
            $request->validate([
                   "date" =>"required",
-                  "time"=>"required"
+                  "time"=>"required",
+                  "service" => "required"
            ]);
 
            try {
@@ -28,7 +29,7 @@ class EventoController extends Controller
                ->where('time', $time)
                ->first();
 
-               $existingEventDate = Evento::where('date', $date)->first();
+              
 
 
 
@@ -36,9 +37,7 @@ class EventoController extends Controller
             return response()->json(['errors' => "Você já possui um evento para esta data e hora"], 400);
          }
 
-         if(auth()->user()->eventos()->where("event_id",$existingEventDate?->id)->exists()) {
-            return response()->json(['errors' => "Você já possui um evento para esta data"], 400);
-         }
+         
 
 
             if(!$existingEvent) {
@@ -47,17 +46,12 @@ class EventoController extends Controller
                $event = new Evento();
                $event->date = $date;
                $event->time = $time;
-
+               $event->service = $request->service;
                $event->academia_id = 1;
                $event->save();
                $event->users()->attach(auth()->user()->id);
             } else {
-               if($existingEvent->users()->count() > $existingEvent->academia->capacidade) {
-                  return response()->json(['errors' => "O evento já está lotado para esta data e hora"], 400);
-               }
-               if(!auth()->user()->eventos()->where("event_id",$existingEvent->id)->exists()){
-               $existingEvent->users()->attach(auth()->user()->id);
-               }
+             
 
 
 
@@ -93,16 +87,17 @@ class EventoController extends Controller
 
     }
 
-    public function getEvents(){
-
-         try{
-        $events = auth()->user()->eventos;
-
-        return response()->json(["events"=> EventoResource::collection($events)],200);
-         }catch(\Exception $e) {
+    public function getEvents()
+    {
+        try {
+         
+            $events = auth()->user()->eventos()->orderBy("created_at", "desc")->get();
+            
+            return response()->json(["events" => EventoResource::collection($events)], 200);
+        } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
-         }
-}
+        }
+    }
 
 public function getAllEvents() {
    try{
@@ -121,6 +116,12 @@ public function cancelarAgendamento($id) {
    $event->delete();
  }
 }
+
+public function delete(Evento $evento) {
+   $evento->delete();
+}
+
+
 
 
 
