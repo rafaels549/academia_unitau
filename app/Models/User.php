@@ -21,12 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'ra',
+       
         "is_admin",
         'is_blocked',
-        'curso',
-        'periodo',
-        'documento'
+        'login_code',
+        'phone'
+        
     ];
 
     protected $appends = ['faltou'];
@@ -63,6 +63,11 @@ class User extends Authenticatable
     public function eventos(){
         return $this->belongsToMany(Evento::class, "eventos_user","user_id","event_id");
     }
+
+    public function routeNotificationForTwilio() {
+        return $this->phone;
+    }
+
 
 
 }

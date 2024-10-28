@@ -6,6 +6,8 @@ use App\Http\Resources\EventoResource;
 use Illuminate\Http\Request;
 use App\Models\Evento;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class EventoController extends Controller
 {
@@ -117,8 +119,15 @@ public function cancelarAgendamento($id) {
  }
 }
 
-public function delete(Evento $evento) {
+public function delete($id) {
+   try {
+
+  $evento = Evento::findOrFail($id);
    $evento->delete();
+   return response()->json(['message' => 'Evento deletado com sucesso.'], 200);
+} catch(Exception $e) {
+   Log::info($e);
+}
 }
 
 

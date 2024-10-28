@@ -19,15 +19,10 @@ class UserResource extends JsonResource
             "id" => $this->id,
             "name" => $this->name,
             "email" => $this->email,
-            "faltas" => $this->faltas->count(),
-            "curso" => $this->curso,
-            "periodo" => $this->periodo,
-            "documento" => $this->documento ? url('/') . Storage::url($this->documento) : null,
-            "faltasEvento" => $this->faltas,
-            "ra" => $this->ra,
-            "is_admin" => $this->is_admin,
-            'image' => url('/') . $this->avatar,
-            "is_blocked" => $this->is_blocked
+
+            "is_admin" => (bool) $this->is_admin,
+            "is_blocked" => (bool) $this->is_blocked,
+            "phone" => $this->phone
         ];
     }
 }
