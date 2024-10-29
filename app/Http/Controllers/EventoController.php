@@ -71,12 +71,13 @@ class EventoController extends Controller
     public function update(Evento $event,Request $request){
         $request->validate([
             "date" =>"required",
-            "time"=>"required"
+            "time"=>"required",
+            "service"=>"required"
      ]);
         try{
                $event->date = $request->date;
                $event->time = $request->time;
-
+               $event->service = $request->service;
                $event->save();
 
 
