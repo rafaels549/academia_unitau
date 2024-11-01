@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\EventoEditResource;
 use App\Http\Resources\EventoResource;
 use Illuminate\Http\Request;
 use App\Models\Evento;
@@ -68,13 +69,15 @@ class EventoController extends Controller
     }
 
 
-    public function update(Evento $event,Request $request){
+    public function update($id,Request $request){
         $request->validate([
             "date" =>"required",
             "time"=>"required",
             "service"=>"required"
      ]);
         try{
+         $event = Evento::findOrFail($id);
+    
                $event->date = $request->date;
                $event->time = $request->time;
                $event->service = $request->service;
@@ -132,7 +135,11 @@ public function delete($id) {
 }
 
 
-
+public function getEvent($id) {
+   $evento = Evento::findOrFail($id);
+   $eventoResource = new EventoEditResource($evento);
+   return $eventoResource;
+}
 
 
 
