@@ -11,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Academia;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\ServiceController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return new UserResource($request->user());
@@ -75,6 +76,13 @@ Route::middleware(['auth:sanctum'])->group( function () {
         Route::patch('/disponible-hours', [GeneralController::class, 'getDisponibleHoursOfTheDate']);
         Route::get("/removedates", [GeneralController::class, "getRemovedDates"]);
         Route::get("/addeddates", [GeneralController::class, "getAddedDates"]);
+    });
+
+    Route::prefix('service')->group(function() {
+       Route::get('/get/{id}', [ServiceController::class, "get"])->middleware("admin");
+       Route::post('/create/{id}', [ServiceController::class, "create"])->middleware('admin');
+       Route::delete('/delete/{id}',[ServiceController::class, "delete"])->middleware('admin');
+       Route::post('/update/{id}', [ServiceController::class, "update"])->middleware('admin');
     });
 });
 

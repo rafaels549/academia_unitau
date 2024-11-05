@@ -101,10 +101,10 @@ class GeneralController extends Controller
                                    ->where('time', $currentTime->format('H:i:s'))
                                    ->first();
                     if($event) {
-                        $eventCount = $event->users()->count();
-                        if ($eventCount < $capacity) {
+                       
+                       
                             $horarios[] = $currentTime->format('H:i');
-                        }
+                     
                     } else {
                         $horarios[] = $currentTime->format('H:i');
                     }
