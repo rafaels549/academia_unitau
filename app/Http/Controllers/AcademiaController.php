@@ -9,110 +9,130 @@ use App\Models\Academia;
 use App\Models\Evento;
 use App\Models\OpenDay;
 use App\Models\Falta;
+use App\Models\OpenDayTimes;
 use App\Models\SpecificDate;
 use App\Models\User;
 use Carbon\Carbon;
 
 class AcademiaController extends Controller
 {
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $request->validate([
-            "capacidade" =>"required",
-            "telefone"=>"required",
-              "days" => "required|array|min:1",
-              'start_hour'=>"required",
-              'end_hour'=>"required"
-     ]);
-        try{
+            "capacidade" => "required",
+            "telefone" => "required",
+            "days" => "required|array|min:1",
+            "start_hour" => "required",
+            "end_hour" => "required"
+        ]);
+    
+        try {
+            // Cria uma nova academia
+            $academia = new Academia();
+            $academia->phone = $request->telefone;
+            $academia->capacidade = $request->capacidade;
+            $academia->save();
+    
+            // Salva os dias e horários relacionados
+            foreach ($request->days as $day) {
+                // Cria um novo dia relacionado à academia
+                $open_day = new OpenDay();
+                $open_day->academia_id = $academia->id;
+                $open_day->day = $day;
+                $open_day->save();
+    
+                // Adiciona os horários para este dia
+                $open_day_time = new OpenDayTimes();
+                $open_day_time->open_day_id = $open_day->id;
+                $open_day_time->opening_time = $request->start_hour;
+                $open_day_time->closing_time = $request->end_hour;
+                $open_day_time->save();
+            }
+    
+            return response()->json(['success' => 'Academia criada com sucesso!'], 201);
+    
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+    
 
 
-         $academia = new Academia();
-         $academia->phone= $request->telefone;
-         $academia->capacidade= $request->capacidade;
-         $days[]=$request->days;
-
-
-
-
-          foreach($days as $day){
-                   $open_day = new OpenDay();
-                    $open_day->academia_id =$academia->id;
-
-
-                    $open_day->day = $day;
-                    $open_day->start_hour =$request->start_hour;
-                    $open_day->end_hour = $request->end_hour;
-
-
-
-                    $open_day->save();
-
-
-
-
-
-          }
-
-
-         $academia->save();
-    }catch(\Exception $e) {
-        return response()->json(['error' => $e->getMessage()], 400);
-     }
- }
-
-
- public function update(Request $request)
+    public function update(Request $request)
 {
-
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'phone' => 'required|string|max:15',
+        'capacidade' => 'required|integer|min:1',
+        'max_faltas' => 'required|integer|min:0',
+        'schedule' => 'required|array|min:1',
+        'schedule.*.day' => 'required|string',
+        'schedule.*.shifts' => 'required|array|min:1',
+        'schedule.*.shifts.*.openingTime' => 'required  ',
+        'schedule.*.shifts.*.closingTime' => 'required|after:schedule.*.shifts.*.openingTime',
+    ]);
 
     try {
         $academia = Academia::findOrFail(1);
+
+        // Atualiza os dados da academia
         $academia->update($request->only(['name', 'phone', 'capacidade', 'max_faltas']));
 
-        // Remove existing schedules
-        $academia->schedules()->delete();
+        // Remove os dias e horários existentes
+        $academia->schedules()->each(function ($openDay) {
+            $openDay->openDayTimes()->delete(); // Remove os horários associados
+            $openDay->delete(); // Remove o dia
+        });
 
-        foreach ($request->schedule as $index => $schedule) {
+        // Adiciona os novos dias e horários
+        foreach ($request->schedule as $schedule) {
+            $dia = null;
 
-$dia = null;
-
-          switch ($schedule['day']) {
-            case 'Segunda':
-                $dia = DaysOfWeek::Segunda;
-                break;
-            case 'Terça':
-                $dia = DaysOfWeek::Terça;
-                break;
-            case 'Quarta':
-                $dia = DaysOfWeek::Quarta;
-                break;
-            case 'Quinta':
-                $dia = DaysOfWeek::Quinta;
-                break;
-            case 'Sexta':
-                $dia = DaysOfWeek::Sexta;
-                break;
-            case 'Sábado':
-                $dia = DaysOfWeek::Sábado;
-                break;
-            case 'Domingo':
-                $dia = DaysOfWeek::Domingo;
-                break;
-        }
-
-            $academia->schedules()->create([
-
+            switch ($schedule['day']) {
+              case 'Segunda':
+                  $dia = DaysOfWeek::Segunda;
+                  break;
+              case 'Terça':
+                  $dia = DaysOfWeek::Terça;
+                  break;
+              case 'Quarta':
+                  $dia = DaysOfWeek::Quarta;
+                  break;
+              case 'Quinta':
+                  $dia = DaysOfWeek::Quinta;
+                  break;
+              case 'Sexta':
+                  $dia = DaysOfWeek::Sexta;
+                  break;
+              case 'Sábado':
+                  $dia = DaysOfWeek::Sábado;
+                  break;
+              case 'Domingo':
+                  $dia = DaysOfWeek::Domingo;
+                  break;
+          }
+  
+  
+            // Cria um novo dia
+            $openDay = $academia->schedules()->create([
                 'day' => $dia->value,
-                'opening_time' => $schedule['openingTime'],
-                'closing_time' => $schedule['closingTime'],
             ]);
+
+            // Cria múltiplos turnos para o dia
+            foreach ($schedule['shifts'] as $shift) {
+                $openDay->openDayTimes()->create([
+                    'opening_time' => $shift['openingTime'],
+                    'closing_time' => $shift['closingTime'],
+                ]); 
+            }
         }
 
-        return response()->json(["sucess"=>"OK"],200);
+        return response()->json(["success" => "OK"], 200);
     } catch (\Exception $e) {
         return response()->json(['error' => $e->getMessage()], 400);
     }
 }
+
 
 
 public function getAcademia(){

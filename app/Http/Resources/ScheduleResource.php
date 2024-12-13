@@ -25,8 +25,7 @@ class ScheduleResource extends JsonResource
               'name' => $informations->name,
               'value' => $informations->value
             ],
-            'opening_time' => Carbon::parse($this->opening_time)->format('H:i'),
-            'closing_time' => Carbon::parse($this->closing_time)->format('H:i'),
+            'openDayTimes' => $this->openDayTimes
         ];
     }
 }

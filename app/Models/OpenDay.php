@@ -14,7 +14,9 @@ class OpenDay extends Model
         'day' => DaysOfWeek::class
      ];
      
-    protected $fillable = ['academia_id', 'day', 'opening_time', 'closing_time'];
-
+    protected $fillable = ['academia_id', 'day'];
+   public function openDayTimes() {
+    return $this->hasMany(OpenDayTimes::class);
+   }
    
 }

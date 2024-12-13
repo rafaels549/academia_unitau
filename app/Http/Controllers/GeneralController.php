@@ -42,81 +42,73 @@ class GeneralController extends Controller
     }
     }
 
-    public function getDisponibleHoursOfTheDate(Request $request) {
-        $formattedDate = Carbon::parse($request->date);
-
-        // Obter o dia da semana em formato ISO (1 = segunda-feira, 7 = domingo)
-        $dayOfWeek = $formattedDate->dayOfWeekIso;
-
-
-        switch($dayOfWeek) {
-            case 1:
-                $dayOfWeek = 2;
-                break;
-            case 2:
-                $dayOfWeek = 3;
-                break;
-            case 3:
-                $dayOfWeek = 4;
-                break;
-            case 4:
-                $dayOfWeek = 5;
-                break;
-            case 5:
-                $dayOfWeek = 6;
-                break;
-            case 6:
-                $dayOfWeek = 7;
-                break;
-            case 7:
-                $dayOfWeek = 1;
-                break;
-
-        }
-
-
-        $horarios = [];
-        $academia = Academia::findOrFail(1);
-
-        $disponibleDay = OpenDay::where('day', $dayOfWeek)->first();
-
-        if ($disponibleDay) {
-            $openingTime = Carbon::parse($disponibleDay->opening_time);
-            $closingTime = Carbon::parse($disponibleDay->closing_time);
-
-            $currentDateTime = Carbon::now();
-            $isToday = $formattedDate->isToday();
-            $currentTime = $openingTime->copy();
-
-            $capacity = $academia->capacidade; // Defina a capacidade máxima da academia aqui
-
-            while ($currentTime->lessThan($closingTime)) {
-                if ($isToday && $currentTime->lessThan($currentDateTime)) {
-                    $currentTime->addHour();
-                    continue;
-                }
-
-
-                $event = Evento::where('date', $formattedDate->format('Y-m-d'))
-                                   ->where('time', $currentTime->format('H:i:s'))
-                                   ->first();
-                    if($event) {
-                        $eventCount = $event->users()->count();
-                        if ($eventCount < $capacity) {
+    public function getDisponibleHoursOfTheDate(Request $request)
+    {
+        try {
+            $formattedDate = Carbon::parse($request->date);
+    
+            // Obter o dia da semana no formato ISO (1 = segunda-feira, 7 = domingo)
+            $dayOfWeek = $formattedDate->dayOfWeekIso;
+    
+            // Ajustar o valor do dia da semana para o modelo
+            switch ($dayOfWeek) {
+                case 1: $dayOfWeek = 2; break; // Segunda-feira
+                case 2: $dayOfWeek = 3; break; // Terça-feira
+                case 3: $dayOfWeek = 4; break; // Quarta-feira
+                case 4: $dayOfWeek = 5; break; // Quinta-feira
+                case 5: $dayOfWeek = 6; break; // Sexta-feira
+                case 6: $dayOfWeek = 7; break; // Sábado
+                case 7: $dayOfWeek = 1; break; // Domingo
+            }
+    
+            $horarios = [];
+            $academia = Academia::findOrFail(1);
+    
+            // Obter os dias disponíveis com base no dia da semana
+            $disponibleDay = OpenDay::where('day', $dayOfWeek)->first();
+    
+            if ($disponibleDay) {
+                // Iterar por cada turno configurado para o dia
+                foreach ($disponibleDay->openDayTimes as $timeSlot) {
+                    $openingTime = Carbon::parse($timeSlot->opening_time);
+                    $closingTime = Carbon::parse($timeSlot->closing_time);
+    
+                    $currentDateTime = Carbon::now();
+                    $isToday = $formattedDate->isToday();
+                    $currentTime = $openingTime->copy();
+    
+                    $capacity = $academia->capacidade; // Capacidade máxima da academia
+    
+                    // Verificar disponibilidade em cada turno
+                    while ($currentTime->lessThan($closingTime)) {
+                        if ($isToday && $currentTime->lessThan($currentDateTime)) {
+                            $currentTime->addHour();
+                            continue;
+                        }
+    
+                        $event = Evento::where('date', $formattedDate->format('Y-m-d'))
+                            ->where('time', $currentTime->format('H:i:s'))
+                            ->first();
+    
+                        if ($event) {
+                            $eventCount = $event->users()->count();
+                            if ($eventCount < $capacity) {
+                                $horarios[] = $currentTime->format('H:i');
+                            }
+                        } else {
                             $horarios[] = $currentTime->format('H:i');
                         }
-                    } else {
-                        $horarios[] = $currentTime->format('H:i');
+    
+                        $currentTime->addHour();
                     }
-
-
-
-                $currentTime->addHour();
+                }
+    
+                return response()->json(["horarios" => $horarios], 200);
+            } else {
+                return response()->json(['error' => 'Nenhum horário disponível para este dia'], 400);
             }
-
-            return response()->json(["horarios" => $horarios], 200);
-        } else {
-            return response()->json(['error' => $dayOfWeek], 400);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
